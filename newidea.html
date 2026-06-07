@@ -14,10 +14,10 @@
       background: #b7008c;
       display: flex;
       justify-content: center;
-      align-items: center;
-      height: 100vh;
+      align-items: flex-start;
+      min-height: 100vh;
       margin: 0;
-      padding: 20px;
+      padding: 30px;
     }
 
     .form-container {
@@ -25,7 +25,7 @@
       padding: 25px;
       border-radius: 12px;
       width: 100%;
-      max-width: 450px;
+      max-width: 500px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
 
@@ -58,7 +58,7 @@
     }
 
     .submit-btn {
-      margin-top: 20px;
+      margin-top: 25px;
       width: 100%;
       padding: 12px;
       background: #fe8e3d;
@@ -73,20 +73,19 @@
     .submit-btn:hover {
       background: #ff7a1a;
     }
-    
-    .step-block {
-     background: #f7f7f7;
-     padding: 15px;
-     border-radius: 10px;
-     margin-top: 20px;
-     border-left: 5px solid #fe8e3d;
-    }
-    
-    .step-block h3 {
-     color: #b7008c;
-     margin-bottom: 10px;
-    }   
 
+    .step-block {
+      background: #f7f7f7;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 20px;
+      border-left: 5px solid #fe8e3d;
+    }
+
+    .step-block h3 {
+      color: #b7008c;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 
@@ -96,7 +95,7 @@
     <h1>New Idea</h1>
 
     <label>Title of Project</label>
-    <input type="text" placeholder="Enter idea title">
+    <input id="ideaTitle" type="text" placeholder="Enter idea title">
 
     <label>Type of Project</label>
     <select>
@@ -117,66 +116,119 @@
     </select>
 
     <label>Materials</label>
-    <textarea placeholder="List materials needed"></textarea>
-
-    <label>Number of Steps</label>
-<input type="number" id="stepCount" min="1" max="20" placeholder="Enter number of steps">
-
-<div id="stepsContainer"></div>
-
+    <textarea id="ideaMaterials" placeholder="List materials needed"></textarea>
 
     <label>Overall Difficulty</label>
-    <select>
+    <select id="ideaDifficulty">
       <option>Easy</option>
       <option>Medium</option>
       <option>Hard</option>
     </select>
 
     <label>Priority</label>
-    <select>
+    <select id="ideaPriority">
       <option>It's Not</option>
       <option>Low</option>
       <option>Medium</option>
       <option>High</option>
     </select>
 
-    <button class="submit-btn">Save Idea</button>
+    <label>Number of Steps</label>
+    <input type="number" id="stepCount" min="1" max="20" placeholder="Enter number of steps">
+
+    <div id="stepsContainer"></div>
+
+    <button id="saveIdeaBtn" class="submit-btn">Save Idea</button>
   </div>
 
-<script>
-document.getElementById("stepCount").addEventListener("input", function () {
-  const count = parseInt(this.value);
-  const container = document.getElementById("stepsContainer");
-  container.innerHTML = ""; // clear old steps
+  <!-- FIREBASE + SAVE LOGIC -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  if (!count || count < 1) return;
+    const firebaseConfig = {
+  apiKey: "AIzaSyCLfSyJTrfKJ11y0-OD-tqce51hAhB9ubk",
+  authDomain: "artportfolio-7fb57.firebaseapp.com",
+  projectId: "artportfolio-7fb57",
+  storageBucket: "artportfolio-7fb57.firebasestorage.app",
+  messagingSenderId: "221364362709",
+  appId: "1:221364362709:web:4ad550bd8970302ef0715c"
+};
 
-  for (let i = 1; i <= count; i++) {
-    const stepBlock = document.createElement("div");
-    stepBlock.className = "step-block";
-    stepBlock.innerHTML = `
-      <h3>Step ${i}</h3>
 
-      <label>Step Title</label>
-      <input type="text" name="stepTitle${i}" placeholder="Title for step ${i}">
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-      <label>Materials Needed</label>
-      <textarea name="stepMaterials${i}" placeholder="Materials for step ${i}"></textarea>
+    // Dynamic Step Generator
+    document.getElementById("stepCount").addEventListener("input", function () {
+      const count = parseInt(this.value);
+      const container = document.getElementById("stepsContainer");
+      container.innerHTML = "";
 
-      <label>Difficulty</label>
-      <select name="stepDifficulty${i}">
-        <option>Easy</option>
-        <option>Medium</option>
-        <option>Hard</option>
-      </select>
+      if (!count || count < 1) return;
 
-      <label>Approx. Time</label>
-      <input type="text" name="stepTime${i}" placeholder="e.g., 10 min">
-    `;
-    container.appendChild(stepBlock);
-  }
-});
-</script>
+      for (let i = 1; i <= count; i++) {
+        const step = document.createElement("div");
+        step.className = "step-block";
+
+        step.innerHTML = `
+          <h3>Step ${i}</h3>
+
+          <label>Step Title</label>
+          <input type="text" class="step-title">
+
+          <label>Materials Needed</label>
+          <textarea class="step-materials"></textarea>
+
+          <label>Difficulty</label>
+          <select class="step-difficulty">
+            <option>Easy</option>
+            <option>Medium</option>
+            <option>Hard</option>
+          </select>
+
+          <label>Approx. Time</label>
+          <input type="text" class="step-time" placeholder="e.g., 10 min">
+        `;
+
+        container.appendChild(step);
+      }
+    });
+
+    // Save to Firestore
+    document.getElementById("saveIdeaBtn").addEventListener("click", async () => {
+      const title = document.getElementById("ideaTitle").value;
+      const type = document.getElementById("ideaType").value;
+      const materials = document.getElementById("ideaMaterials").value;
+      const difficulty = document.getElementById("ideaDifficulty").value;
+      const priority = document.getElementById("ideaPriority").value;
+
+      const steps = [];
+      const blocks = document.querySelectorAll(".step-block");
+
+      blocks.forEach(block => {
+        steps.push({
+          title: block.querySelector(".step-title").value,
+          materials: block.querySelector(".step-materials").value,
+          difficulty: block.querySelector(".step-difficulty").value,
+          time: block.querySelector(".step-time").value
+        });
+      });
+
+      await addDoc(collection(db, "ideas"), {
+        title,
+        type,
+        materials,
+        difficulty,
+        priority,
+        steps,
+        createdAt: new Date()
+      });
+
+      alert("Idea saved!");
+    });
+  </script>
 
 </body>
 </html>
