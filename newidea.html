@@ -87,20 +87,53 @@
       margin-bottom: 10px;
     }
 
-    .type-options {
-  display: list-item;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px 20px;
+    /* Container: one column, left aligned */
+.type-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   margin-bottom: 10px;
 }
 
+/* Label styling */
 .type-options label {
   color: #b7008c;
   font-weight: 500;
   display: flex;
-  align-items: left;
-  gap: 6px;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
 }
+
+/* Hide the default checkbox */
+.type-options input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #b7008c;
+  border-radius: 6px; /* rounded corners */
+  cursor: pointer;
+  position: relative;
+  transition: 0.2s;
+}
+
+/* Purple fill when checked */
+.type-options input[type="checkbox"]:checked {
+  background-color: #b7008c;
+  border-color: #b7008c;
+}
+
+/* Checkmark */
+.type-options input[type="checkbox"]:checked::after {
+  content: "✔";
+  color: white;
+  font-size: 14px;
+  position: absolute;
+  top: -2px;
+  left: 3px;
+}
+
 
   </style>
 </head>
