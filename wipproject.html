@@ -71,7 +71,11 @@
       const data = docSnap.data();
 
       document.getElementById("title").textContent = data.title;
-      document.getElementById("details").textContent = data.details;
+      document.getElementById("type").textContent = data.type;
+      document.getElementById("materials").textContent = data.materials;
+      document.getElementById("difficulty").textContent = data.difficulty;
+      document.getElementById("priority").textContent = data.priority;
+      document.getElementById("steps").textContent = data.steps;
     }
 
     loadIdea();
