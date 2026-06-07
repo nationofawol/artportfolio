@@ -55,6 +55,47 @@ h1 {
 .nav-btn:hover {
   background: #ff7a1a;
 }
+/* Dropdown container */
+.dropdown {
+  position: relative;
+}
+
+/* Hide dropdown by default */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 50px;
+  left: 0;
+  background: #fe8e3d;
+  border-radius: 8px;
+  width: 100%;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* Dropdown links */
+.dropdown-content a {
+  display: block;
+  padding: 12px;
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.dropdown-content a:hover {
+  background: #ff7a1a;
+}
+
+/* Show dropdown on hover */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Make the main button look clickable */
+.dropdown > .nav-btn {
+  cursor: pointer;
+}
+
 </style>
 
 </head>
