@@ -25,6 +25,58 @@ ul li {
   margin-bottom: 6px;
 }
 
+.step-card {
+  background: #f7f7f7;
+  border-left: 6px solid #fe8e3d;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  color: #444;
+}
+
+.step-card h3 {
+  margin: 0 0 8px 0;
+  color: #b7008c;
+}
+
+.step-meta {
+  font-size: 14px;
+  margin-top: 6px;
+  color: #666;
+}
+
+.total-time-badge {
+  display: inline-block;
+  background: #fe8e3d;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+.action-btn {
+  background: #b7008c;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-right: 10px;
+  font-size: 15px;
+}
+
+.action-btn:hover {
+  background: #9a0075;
+}
+
+.action-btn.delete {
+  background: #ff0015;
+}
+
+.action-btn.delete:hover {
+  background: #ff0015;
+}
+
 
     .container {
       max-width: 700px;
@@ -47,6 +99,12 @@ ul li {
   <div class="container">
     <a href="list.html">← Back to list</a>
     <h1 id="title">Loading...</h1>
+    <div id="totalTime" class="total-time-badge" style="display:none;"></div>
+    <div style="margin: 15px 0;">
+  <button id="editBtn" class="action-btn">Edit</button>
+  <button id="deleteBtn" class="action-btn delete">Delete</button>
+</div>
+
     <p><strong>Type:</strong></p>
 <ul id="type"></ul>
 
@@ -95,7 +153,7 @@ ul li {
 
       document.getElementById("title").textContent = data.title;
 
-// TYPE (array)
+// --- TYPE ---
 const typeList = document.getElementById("type");
 typeList.innerHTML = "";
 data.type.forEach(t => {
@@ -104,26 +162,72 @@ data.type.forEach(t => {
   typeList.appendChild(li);
 });
 
-// MATERIALS
+// --- MATERIALS ---
 document.getElementById("materials").textContent = data.materials;
 
-// DIFFICULTY + PRIORITY
+// --- DIFFICULTY + PRIORITY ---
 document.getElementById("difficulty").textContent = data.difficulty;
 document.getElementById("priority").textContent = data.priority;
 
-// STEPS (array of objects)
+// --- STEPS AS CARDS ---
 const stepsList = document.getElementById("steps");
 stepsList.innerHTML = "";
 
+let totalMinutes = 0;
+
 data.steps.forEach((step, index) => {
-  const li = document.createElement("li");
-  li.innerHTML = `
-    <strong>Step ${index + 1}:</strong> ${step.title}<br>
-    <em>Materials:</em> ${step.materials}<br>
-    <em>Difficulty:</em> ${step.difficulty}<br>
-    <em>Time:</em> ${step.time}
+  const card = document.createElement("div");
+  card.className = "step-card";
+
+  // Extract minutes from "10 min" or "1 hr 20 min"
+  const timeText = step.time.toLowerCase();
+  let minutes = 0;
+
+  const hrMatch = timeText.match(/(\d+)\s*hr/);
+  const minMatch = timeText.match(/(\d+)\s*min/);
+
+  if (hrMatch) minutes += parseInt(hrMatch[1]) * 60;
+  if (minMatch) minutes += parseInt(minMatch[1]);
+
+  totalMinutes += minutes;
+
+  card.innerHTML = `
+    <h3>Step ${index + 1}: ${step.title}</h3>
+    <div class="step-meta"><strong>Materials:</strong> ${step.materials}</div>
+    <div class="step-meta"><strong>Difficulty:</strong> ${step.difficulty}</div>
+    <div class="step-meta"><strong>Time:</strong> ${step.time}</div>
   `;
-  stepsList.appendChild(li);
+
+  stepsList.appendChild(card);
+});
+
+// --- TOTAL TIME BADGE ---
+if (totalMinutes > 0) {
+  const hours = Math.floor(totalMinutes / 60);
+  const mins = totalMinutes % 60;
+
+  let display = "";
+  if (hours > 0) display += `${hours} hr `;
+  if (mins > 0) display += `${mins} min`;
+
+  const badge = document.getElementById("totalTime");
+  badge.textContent = `Total Time: ${display}`;
+  badge.style.display = "inline-block";
+});
+
+
+import { deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+document.getElementById("deleteBtn").addEventListener("click", async () => {
+  if (confirm("Delete this idea?")) {
+    await deleteDoc(doc(db, "ideas", id));
+    window.location.href = "list.html";
+  }
+
+  document.getElementById("editBtn").addEventListener("click", () => {
+  window.location.href = `newidea.html?id=${id}`;
+});
+
 });
 
     }
