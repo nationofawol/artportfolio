@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Idea Details</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Josefin Sans', sans-serif;
+      background: #b7008c;
+      padding: 30px;
+      margin: 0;
+      color: white;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      background: white;
+      color: #b7008c;
+      padding: 25px;
+      border-radius: 12px;
+    }
+
+    a {
+      color: #b7008c;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <a href="list.html">← Back to list</a>
+    <h1 id="title">Loading...</h1>
+    <p id="details"></p>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, getDoc }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCLfSyJTrfKJ11y0-OD-tqce51hAhB9ubk",
+      authDomain: "artportfolio-7fb57.firebaseapp.com",
+      projectId: "artportfolio-7fb57",
+      storageBucket: "artportfolio-7fb57.firebasestorage.app",
+      messagingSenderId: "221364362709",
+      appId: "1:221364362709:web:4ad550bd8970302ef0715c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function loadIdea() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get("id");
+
+      const docRef = doc(db, "ideas", id);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        document.getElementById("title").textContent = "Idea not found";
+        return;
+      }
+
+      const data = docSnap.data();
+
+      document.getElementById("title").textContent = data.title;
+      document.getElementById("details").textContent = data.details;
+    }
+
+    loadIdea();
+  </script>
+
+</body>
+</html>

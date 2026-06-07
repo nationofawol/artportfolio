@@ -86,28 +86,30 @@
 
       list.innerHTML = ""; // clear loading text
 
-      qquerySnapshot.forEach(doc => {
+      querySnapshot.forEach(doc => {
   const data = doc.data();
 
   const item = document.createElement("div");
   item.className = "idea-item";
 
-  // Title
-  const title = document.createElement("div");
+  // Clickable title → opens idea.html?id=DOC_ID
+  const title = document.createElement("a");
   title.textContent = data.title;
+  title.href = `wipproject.html?id=${doc.id}`;
   title.style.fontWeight = "600";
+  title.style.textDecoration = "none";
+  title.style.color = "inherit";
 
-  // Details (hidden until hover)
+  // Hover details
   const details = document.createElement("div");
   details.className = "idea-details";
   details.textContent = data.details || "(no details yet)";
 
-  // Add both to item
   item.appendChild(title);
   item.appendChild(details);
-
   list.appendChild(item);
 });
+
 
 
       if (list.innerHTML.trim() === "") {
