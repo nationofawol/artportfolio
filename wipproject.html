@@ -14,6 +14,17 @@
       margin: 0;
       color: white;
     }
+    ul {
+  margin-top: 5px;
+  margin-bottom: 15px;
+  padding-left: 20px;
+  color: #444;
+}
+
+ul li {
+  margin-bottom: 6px;
+}
+
 
     .container {
       max-width: 700px;
@@ -36,11 +47,19 @@
   <div class="container">
     <a href="list.html">← Back to list</a>
     <h1 id="title">Loading...</h1>
-    <p id="type"></p>
-    <p id="materials"></p>
-    <p id="difficulty"></p>
-    <p id="priority"></p>
-    <p id="steps"></p>
+    <p><strong>Type:</strong></p>
+<ul id="type"></ul>
+
+<p><strong>Materials:</strong></p>
+<p id="materials"></p>
+
+<p><strong>Difficulty:</strong> <span id="difficulty"></span></p>
+
+<p><strong>Priority:</strong> <span id="priority"></span></p>
+
+<p><strong>Steps:</strong></p>
+<ul id="steps"></ul>
+
   </div>
 
   <script type="module">
@@ -75,11 +94,38 @@
       const data = docSnap.data();
 
       document.getElementById("title").textContent = data.title;
-      document.getElementById("type").textContent = data.type;
-      document.getElementById("materials").textContent = data.materials;
-      document.getElementById("difficulty").textContent = data.difficulty;
-      document.getElementById("priority").textContent = data.priority;
-      document.getElementById("steps").textContent = data.steps;
+
+// TYPE (array)
+const typeList = document.getElementById("type");
+typeList.innerHTML = "";
+data.type.forEach(t => {
+  const li = document.createElement("li");
+  li.textContent = t;
+  typeList.appendChild(li);
+});
+
+// MATERIALS
+document.getElementById("materials").textContent = data.materials;
+
+// DIFFICULTY + PRIORITY
+document.getElementById("difficulty").textContent = data.difficulty;
+document.getElementById("priority").textContent = data.priority;
+
+// STEPS (array of objects)
+const stepsList = document.getElementById("steps");
+stepsList.innerHTML = "";
+
+data.steps.forEach((step, index) => {
+  const li = document.createElement("li");
+  li.innerHTML = `
+    <strong>Step ${index + 1}:</strong> ${step.title}<br>
+    <em>Materials:</em> ${step.materials}<br>
+    <em>Difficulty:</em> ${step.difficulty}<br>
+    <em>Time:</em> ${step.time}
+  `;
+  stepsList.appendChild(li);
+});
+
     }
 
     loadIdea();
