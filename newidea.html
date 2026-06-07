@@ -86,6 +86,22 @@
       color: #b7008c;
       margin-bottom: 10px;
     }
+
+    .type-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 20px;
+  margin-bottom: 10px;
+}
+
+.type-options label {
+  color: #b7008c;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
   </style>
 </head>
 
@@ -98,22 +114,23 @@
     <input id="ideaTitle" type="text" placeholder="Enter idea title">
 
     <label>Type of Project</label>
-    <select>
-      <option>Acrylic Painting</option>
-      <option>Beading</option>
-      <option>Candle Making</option>
-      <option>Clay</option>
-      <option>Crocheting</option>
-      <option>Digital Art</option>
-      <option>Embroidering</option>
-      <option>Oil Painting</option>
-      <option>Resin</option>
-      <option>Sewing</option>
-      <option>Watercolor</option>
-      <option>Website Building</option>
-      <option>Woodworking</option>
-      <option>Other</option>
-    </select>
+<div class="type-options">
+  <label><input type="checkbox" class="type-check" value="Acrylic Painting"> Acrylic Painting</label>
+  <label><input type="checkbox" class="type-check" value="Beading"> Beading</label>
+  <label><input type="checkbox" class="type-check" value="Candle Making"> Candle Making</label>
+  <label><input type="checkbox" class="type-check" value="Clay"> Clay</label>
+  <label><input type="checkbox" class="type-check" value="Crocheting"> Crocheting</label>
+  <label><input type="checkbox" class="type-check" value="Digital Art"> Digital Art</label>
+  <label><input type="checkbox" class="type-check" value="Embroidering"> Embroidering</label>
+  <label><input type="checkbox" class="type-check" value="Oil Painting"> Oil Painting</label>
+  <label><input type="checkbox" class="type-check" value="Resin"> Resin</label>
+  <label><input type="checkbox" class="type-check" value="Sewing"> Sewing</label>
+  <label><input type="checkbox" class="type-check" value="Watercolor"> Watercolor</label>
+  <label><input type="checkbox" class="type-check" value="Website Building"> Website Building</label>
+  <label><input type="checkbox" class="type-check" value="Woodworking"> Woodworking</label>
+  <label><input type="checkbox" class="type-check" value="Other"> Other</label>
+</div>
+
 
     <label>Materials</label>
     <textarea id="ideaMaterials" placeholder="List materials needed"></textarea>
@@ -199,7 +216,8 @@
     // Save to Firestore
     document.getElementById("saveIdeaBtn").addEventListener("click", async () => {
       const title = document.getElementById("ideaTitle").value;
-      const type = document.getElementById("ideaType").value;
+      const type = Array.from(document.querySelectorAll(".type-check:checked"))
+                  .map(cb => cb.value);
       const materials = document.getElementById("ideaMaterials").value;
       const difficulty = document.getElementById("ideaDifficulty").value;
       const priority = document.getElementById("ideaPriority").value;
