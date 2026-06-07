@@ -54,10 +54,10 @@
   margin-bottom: 4px;
 }
 
-/* Expand on hover */
-.idea-item:hover .idea-details {
-  max-height: 300px; /* large enough for your content */
+.idea-item.expanded .idea-details {
+  max-height: 500px; /* or bigger if needed */
 }
+
 
   </style>
 </head>
@@ -124,6 +124,9 @@
   list.appendChild(item);
 });
 
+item.addEventListener("click", () => {
+  item.classList.toggle("expanded");
+});
 
 
       if (list.innerHTML.trim() === "") {
