@@ -103,7 +103,12 @@
   // Hover details
   const details = document.createElement("div");
   details.className = "idea-details";
-  details.textContent = data.details || "(no details yet)";
+  details.textContent = [
+  data.type,
+  data.material,
+  data.difficultly,
+  data.priority
+].filter(Boolean).join(" • ") || "(no details yet)";
 
   item.appendChild(title);
   item.appendChild(details);
