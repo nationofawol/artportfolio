@@ -104,10 +104,10 @@
   const details = document.createElement("div");
   details.className = "idea-details";
   details.textContent = [
-  data.type,
-  data.material,
-  data.difficultly,
-  data.priority
+  data.type ? `Type: ${data.type}` : null,
+  data.material ? `Material: ${data.material}` : null,
+  data.difficultly ? `Difficulty: ${data.difficultly}` : null,
+  data.priority ? `Priority: ${data.priority}` : null
 ].filter(Boolean).join(" • ") || "(no details yet)";
 
   item.appendChild(title);
