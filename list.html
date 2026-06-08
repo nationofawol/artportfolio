@@ -54,7 +54,11 @@
   margin-bottom: 4px;
 }
 
-.idea-details:hover {
+
+if idea-item:hover then .idea-details max-height: 500px
+
+
+.idea-item:hover .idea-details {
   max-height: 500px; /* or bigger if needed */
 }
 
@@ -96,49 +100,46 @@
       list.innerHTML = ""; // clear loading text
 
       querySnapshot.forEach(doc => {
-  const data = doc.data();
+        const data = doc.data();
+        const item = document.createElement("div");
+        item.className = "idea-item";
 
-  const item = document.createElement("div");
-  item.className = "idea-item";
+        // Clickable title → opens idea.html?id=DOC_ID
+        const title = document.createElement("a");
+        title.textContent = data.title;
+        title.href = `wipproject.html?id=${doc.id}`;
+        title.style.fontWeight = "600";
+        title.style.textDecoration = "none";
+        title.style.color = "inherit";
 
-  // Clickable title → opens idea.html?id=DOC_ID
-  const title = document.createElement("a");
-  title.textContent = data.title;
-  title.href = `wipproject.html?id=${doc.id}`;
-  title.style.fontWeight = "600";
-  title.style.textDecoration = "none";
-  title.style.color = "inherit";
+       // Hover details
+        const details = document.createElement("div");
+        details.className = "idea-details";
+        details.textContent = [
+        data.type ? `Type: ${data.type}` : null,
+        data.material ? `Material: ${data.material}` : null,
+        data.difficultly ? `Difficulty: ${data.difficultly}` : null,
+        data.priority ? `Priority: ${data.priority}` : null
+        ].filter(Boolean).join(" \n • ") || "(no details yet)";
 
-  // Hover details
-  const details = document.createElement("div");
-  details.className = "idea-details";
-  details.textContent = [
-  data.type ? `Type: ${data.type}` : null,
-  data.material ? `Material: ${data.material}` : null,
-  data.difficultly ? `Difficulty: ${data.difficultly}` : null,
-  data.priority ? `Priority: ${data.priority}` : null
-  ].filter(Boolean).join(" • ") || "(no details yet)";
+        item.appendChild(title);
+        item.appendChild(details);
+        list.appendChild(item);
 
+        item.addEventListener("mouseenter", () => {
+          item.classList.add("expanded");
+        });
 
-  item.appendChild(title);
-  item.appendChild(details);
-  list.appendChild(item);
-});
-
-item.addEventListener("mouseenter", () => {
-  item.classList.add("expanded");
-});
-
-item.addEventListener("mouseleave", () => {
-  item.classList.remove("expanded");
-});
-
-
+        item.addEventListener("mouseleave", () => {
+          item.classList.remove("expanded");
+        });
+      });
+    
       if (list.innerHTML.trim() === "") {
-        list.innerHTML = "<p>No ideas yet.</p>";
+      list.innerHTML = "<p>No ideas yet.</p>";
       }
     }
-
+    
     loadIdeas();
   </script>
 
