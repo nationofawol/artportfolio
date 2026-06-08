@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Works In Progress</title>
-  <!-- version 3 -->
+  <!-- version 4 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
@@ -55,10 +55,7 @@
 }
 
 
-if idea-item:hover then .idea-details max-height: 500px
-
-
-.idea-item:hover .idea-details {
+.idea-item.expanded .idea-details.expanded {
   max-height: 500px; /* or bigger if needed */
 }
 
@@ -128,10 +125,12 @@ if idea-item:hover then .idea-details max-height: 500px
 
         item.addEventListener("mouseenter", () => {
           item.classList.add("expanded");
+          details.classList.add("expanded");
         });
 
         item.addEventListener("mouseleave", () => {
           item.classList.remove("expanded");
+          details.classList.remove("expanded");
         });
       });
     
