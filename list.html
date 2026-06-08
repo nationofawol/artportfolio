@@ -41,6 +41,7 @@
       overflow: hidden;
       transition: max-height 0.35s ease;
       font-size: 15px;
+      padding-top: 8px;
       padding-left: 10px;
       color: #ffffff;
     }
@@ -113,9 +114,9 @@
         const details = document.createElement("div");
         details.className = "idea-details";
         details.innerHTML = [
-        data.type ? `<li> Type: ${data.type}</li>` : null,
-        data.material ? `<li> Material: ${data.material}</li>` : null,
-        data.difficultly ? `<li> Difficulty: ${data.difficultly}</li>` : null,
+        data.type ? `<li> Type: ${data.type.join(", ")}</li>` : null,
+        data.materials ? `<li> Materials: ${data.materials}</li>` : null,
+        data.difficulty ? `<li> Difficulty: ${data.difficulty}</li>` : null,
         data.priority ? `<li> Priority: ${data.priority}</li>` : null
         ].filter(Boolean).join(" ") || "<p>(no details yet)</p>";
 
