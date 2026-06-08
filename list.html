@@ -112,12 +112,12 @@
        // Hover details
         const details = document.createElement("div");
         details.className = "idea-details";
-        details.textContent = [
-        data.type ? `Type: ${data.type}` : null,
-        data.material ? `Material: ${data.material}` : null,
-        data.difficultly ? `Difficulty: ${data.difficultly}` : null,
-        data.priority ? `Priority: ${data.priority}` : null
-        ].filter(Boolean).join(" \n • ") || "(no details yet)";
+        details.innerHTML = [
+        data.type ? `<li> Type: ${data.type}</li>` : null,
+        data.material ? `<li> Material: ${data.material}</li>` : null,
+        data.difficultly ? `<li> Difficulty: ${data.difficultly}</li>` : null,
+        data.priority ? `<li> Priority: ${data.priority}</li>` : null
+        ].filter(Boolean).join(" ") || "<p>(no details yet)</p>";
 
         item.appendChild(title);
         item.appendChild(details);
