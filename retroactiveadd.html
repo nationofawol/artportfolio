@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Add a New Idea</title>
-  <!-- version 1 -->
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
@@ -28,29 +28,6 @@
       max-width: 500px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
-
-    .retroactive-link {
-      width: 100%;
-      text-align: center;
-      margin-bottom: 20px;
-      margin-top: 30px;
-      color: white;
-    }
-    
-
-      .nav-btn {
-      background: #fe8e3d;
-      color: white;
-      padding: 10px 16px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-      }
-
-    .nav-btn:hover {
-      background: #e6762d;
-    }
-
 
     h1 {
       text-align: center;
@@ -111,51 +88,51 @@
     }
 
     /* Container: one column, left aligned */
-    .type-options {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
+.type-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 10px;
+}
 
-    /* Label styling */
-    .type-options label {
-      color: #b7008c;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-    }
+/* Label styling */
+.type-options label {
+  color: #b7008c;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
 
-    /* Hide the default checkbox */
-    .type-options input[type="checkbox"] {
-      appearance: none;
-      -webkit-appearance: none;
-      width: 20px;
-      height: 20px;
-      border: 2px solid #b7008c;
-      border-radius: 6px; /* rounded corners */
-      cursor: pointer;
-      position: relative;
-      transition: 0.2s;
-    }
+/* Hide the default checkbox */
+.type-options input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #b7008c;
+  border-radius: 6px; /* rounded corners */
+  cursor: pointer;
+  position: relative;
+  transition: 0.2s;
+}
 
-    /* Purple fill when checked */
-    .type-options input[type="checkbox"]:checked {
-      background-color: #b7008c;
-      border-color: #b7008c;
-    }
+/* Purple fill when checked */
+.type-options input[type="checkbox"]:checked {
+  background-color: #b7008c;
+  border-color: #b7008c;
+}
 
-    /* Checkmark */
-    .type-options input[type="checkbox"]:checked::after {
-      content: "✔";
-      color: white;
-      font-size: 14px;
-      position: absolute;
-      top: -2px;
-      left: 3px;
-    }
+/* Checkmark */
+.type-options input[type="checkbox"]:checked::after {
+  content: "✔";
+  color: white;
+  font-size: 14px;
+  position: absolute;
+  top: -2px;
+  left: 3px;
+}
 
 
   </style>
@@ -164,29 +141,28 @@
 <body>
 
   <div class="form-container">
-
     <h1>New Idea</h1>
 
     <label>Title of Project</label>
     <input id="ideaTitle" type="text" placeholder="Enter idea title">
 
     <label>Type of Project</label>
-    <div class="type-options">
-      <label><input type="checkbox" class="type-check" value="Acrylic Painting"> Acrylic Painting</label>
-      <label><input type="checkbox" class="type-check" value="Beading"> Beading</label>
-      <label><input type="checkbox" class="type-check" value="Candle Making"> Candle Making</label>
-      <label><input type="checkbox" class="type-check" value="Clay"> Clay</label>
-      <label><input type="checkbox" class="type-check" value="Crocheting"> Crocheting</label>
-      <label><input type="checkbox" class="type-check" value="Digital Art"> Digital Art</label>
-      <label><input type="checkbox" class="type-check" value="Embroidering"> Embroidering</label>
-      <label><input type="checkbox" class="type-check" value="Oil Painting"> Oil Painting</label>
-      <label><input type="checkbox" class="type-check" value="Resin"> Resin</label>
-      <label><input type="checkbox" class="type-check" value="Sewing"> Sewing</label>
-      <label><input type="checkbox" class="type-check" value="Watercolor"> Watercolor</label>
-      <label><input type="checkbox" class="type-check" value="Website Building"> Website Building</label>
-      <label><input type="checkbox" class="type-check" value="Woodworking"> Woodworking</label>
-      <label><input type="checkbox" class="type-check" value="Other"> Other</label>
-    </div>
+<div class="type-options">
+  <label><input type="checkbox" class="type-check" value="Acrylic Painting"> Acrylic Painting</label>
+  <label><input type="checkbox" class="type-check" value="Beading"> Beading</label>
+  <label><input type="checkbox" class="type-check" value="Candle Making"> Candle Making</label>
+  <label><input type="checkbox" class="type-check" value="Clay"> Clay</label>
+  <label><input type="checkbox" class="type-check" value="Crocheting"> Crocheting</label>
+  <label><input type="checkbox" class="type-check" value="Digital Art"> Digital Art</label>
+  <label><input type="checkbox" class="type-check" value="Embroidering"> Embroidering</label>
+  <label><input type="checkbox" class="type-check" value="Oil Painting"> Oil Painting</label>
+  <label><input type="checkbox" class="type-check" value="Resin"> Resin</label>
+  <label><input type="checkbox" class="type-check" value="Sewing"> Sewing</label>
+  <label><input type="checkbox" class="type-check" value="Watercolor"> Watercolor</label>
+  <label><input type="checkbox" class="type-check" value="Website Building"> Website Building</label>
+  <label><input type="checkbox" class="type-check" value="Woodworking"> Woodworking</label>
+  <label><input type="checkbox" class="type-check" value="Other"> Other</label>
+</div>
 
 
     <label>Materials</label>
@@ -213,12 +189,6 @@
     <div id="stepsContainer"></div>
 
     <button id="saveIdeaBtn" class="submit-btn">Save Idea</button>
-
-    <div class="retroactive-link">
-         <a href="retroactiveadd.html" class="nav-btn">Add to Archive</a>
-    </div>
-
-
   </div>
 
   <!-- FIREBASE + SAVE LOGIC -->
@@ -309,11 +279,7 @@
 
       alert("Idea saved!");
     });
-
-
     
-
-
   </script>
 
 </body>

@@ -104,8 +104,11 @@
         const item = document.createElement("div");
         item.className = "idea-item";
 
+
+        const titlediv = document.createElement("div");
+
         // Clickable title → opens idea.html?id=DOC_ID
-        const title = document.createElement("div");
+        const title = document.createElement("a");
         title.textContent = data.title;
         title.href = `wipproject.html?id=${doc.id}`;
         title.style.fontWeight = "600";
