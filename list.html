@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Works In Progress</title>
-  <!-- version 4 -->
+  <!-- version 5 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
@@ -28,6 +28,8 @@
       font-size: 18px;
       cursor: pointer;
       transition: 0.2s;
+      display:grid;
+      grid-template-columns: 3fr 1fr 1fr;
       position: relative;
 }
     .idea-item:hover {
@@ -103,7 +105,7 @@
         item.className = "idea-item";
 
         // Clickable title → opens idea.html?id=DOC_ID
-        const title = document.createElement("a");
+        const title = document.createElement("div");
         title.textContent = data.title;
         title.href = `wipproject.html?id=${doc.id}`;
         title.style.fontWeight = "600";
