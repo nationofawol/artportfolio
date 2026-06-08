@@ -117,15 +117,20 @@
   data.material ? `Material: ${data.material}` : null,
   data.difficultly ? `Difficulty: ${data.difficultly}` : null,
   data.priority ? `Priority: ${data.priority}` : null
-].filter(Boolean).join(" • ") || "(no details yet)";
+  ].filter(Boolean).join(" • ") || "(no details yet)";
+
 
   item.appendChild(title);
   item.appendChild(details);
   list.appendChild(item);
 });
 
-item.addEventListener("click", () => {
-  item.classList.toggle("expanded");
+item.addEventListener("mouseenter", () => {
+  item.classList.add("expanded");
+});
+
+item.addEventListener("mouseleave", () => {
+  item.classList.remove("expanded");
 });
 
 
