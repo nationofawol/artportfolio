@@ -118,6 +118,16 @@
   transition: 0.2s;
 }
 
+.photo-preview img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-right: 10px;
+  margin-top: 10px;
+}
+
+
 /* Purple fill when checked */
 .type-options input[type="checkbox"]:checked {
   background-color: #b7008c;
@@ -141,32 +151,32 @@
 <body>
 
   <div class="form-container">
-    <h1>New Idea</h1>
+    <h1>Archived Idea</h1>
 
     <label>Title of Project</label>
-    <input id="ideaTitle" type="text" placeholder="Enter idea title">
+    <input id="ideaTitle" type="text" placeholder="Enter Project Title">
 
     <label>Type of Project</label>
-<div class="type-options">
-  <label><input type="checkbox" class="type-check" value="Acrylic Painting"> Acrylic Painting</label>
-  <label><input type="checkbox" class="type-check" value="Beading"> Beading</label>
-  <label><input type="checkbox" class="type-check" value="Candle Making"> Candle Making</label>
-  <label><input type="checkbox" class="type-check" value="Clay"> Clay</label>
-  <label><input type="checkbox" class="type-check" value="Crocheting"> Crocheting</label>
-  <label><input type="checkbox" class="type-check" value="Digital Art"> Digital Art</label>
-  <label><input type="checkbox" class="type-check" value="Embroidering"> Embroidering</label>
-  <label><input type="checkbox" class="type-check" value="Oil Painting"> Oil Painting</label>
-  <label><input type="checkbox" class="type-check" value="Resin"> Resin</label>
-  <label><input type="checkbox" class="type-check" value="Sewing"> Sewing</label>
-  <label><input type="checkbox" class="type-check" value="Watercolor"> Watercolor</label>
-  <label><input type="checkbox" class="type-check" value="Website Building"> Website Building</label>
-  <label><input type="checkbox" class="type-check" value="Woodworking"> Woodworking</label>
-  <label><input type="checkbox" class="type-check" value="Other"> Other</label>
-</div>
+    <div class="type-options">
+      <label><input type="checkbox" class="type-check" value="Acrylic Painting"> Acrylic Painting</label>
+      <label><input type="checkbox" class="type-check" value="Beading"> Beading</label>
+      <label><input type="checkbox" class="type-check" value="Candle Making"> Candle Making</label>
+      <label><input type="checkbox" class="type-check" value="Clay"> Clay</label>
+      <label><input type="checkbox" class="type-check" value="Crocheting"> Crocheting</label>
+      <label><input type="checkbox" class="type-check" value="Digital Art"> Digital Art</label>
+      <label><input type="checkbox" class="type-check" value="Embroidering"> Embroidering</label>
+      <label><input type="checkbox" class="type-check" value="Oil Painting"> Oil Painting</label>
+      <label><input type="checkbox" class="type-check" value="Resin"> Resin</label>
+      <label><input type="checkbox" class="type-check" value="Sewing"> Sewing</label>
+      <label><input type="checkbox" class="type-check" value="Watercolor"> Watercolor</label>
+      <label><input type="checkbox" class="type-check" value="Website Building"> Website Building</label>
+      <label><input type="checkbox" class="type-check" value="Woodworking"> Woodworking</label>
+      <label><input type="checkbox" class="type-check" value="Other"> Other</label>
+    </div>
 
 
     <label>Materials</label>
-    <textarea id="ideaMaterials" placeholder="List materials needed"></textarea>
+    <textarea id="ideaMaterials" placeholder="Materials Used"></textarea>
 
     <label>Overall Difficulty</label>
     <select id="ideaDifficulty">
@@ -174,19 +184,14 @@
       <option>Medium</option>
       <option>Hard</option>
     </select>
+    
+    
+    <label>Upload Photos</label>
+    <input type="file" id="ideaPhotos" accept="image/*" multiple>
+    <div id="photoPreview" class="photo-preview"></div>
 
-    <label>Priority</label>
-    <select id="ideaPriority">
-      <option>It's Not</option>
-      <option>Low</option>
-      <option>Medium</option>
-      <option>High</option>
-    </select>
 
-    <label>Number of Steps</label>
-    <input type="number" id="stepCount" min="1" max="20" placeholder="Enter number of steps">
 
-    <div id="stepsContainer"></div>
 
     <button id="saveIdeaBtn" class="submit-btn">Save Idea</button>
   </div>
@@ -196,84 +201,49 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, addDoc }
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
 
     const firebaseConfig = {
-  apiKey: "AIzaSyCLfSyJTrfKJ11y0-OD-tqce51hAhB9ubk",
-  authDomain: "artportfolio-7fb57.firebaseapp.com",
-  projectId: "artportfolio-7fb57",
-  storageBucket: "artportfolio-7fb57.firebasestorage.app",
-  messagingSenderId: "221364362709",
-  appId: "1:221364362709:web:4ad550bd8970302ef0715c"
-};
-
+      apiKey: "AIzaSyCLfSyJTrfKJ11y0-OD-tqce51hAhB9ubk",
+      authDomain: "artportfolio-7fb57.firebaseapp.com",
+      projectId: "artportfolio-7fb57",
+      storageBucket: "artportfolio-7fb57.firebasestorage.app",
+      messagingSenderId: "221364362709",
+      appId: "1:221364362709:web:4ad550bd8970302ef0715c"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Dynamic Step Generator
-    document.getElementById("stepCount").addEventListener("input", function () {
-      const count = parseInt(this.value);
-      const container = document.getElementById("stepsContainer");
-      container.innerHTML = "";
-
-      if (!count || count < 1) return;
-
-      for (let i = 1; i <= count; i++) {
-        const step = document.createElement("div");
-        step.className = "step-block";
-
-        step.innerHTML = `
-          <h3>Step ${i}</h3>
-
-          <label>Step Title</label>
-          <input type="text" class="step-title">
-
-          <label>Materials Needed</label>
-          <textarea class="step-materials"></textarea>
-
-          <label>Difficulty</label>
-          <select class="step-difficulty">
-            <option>Easy</option>
-            <option>Medium</option>
-            <option>Hard</option>
-          </select>
-
-          <label>Approx. Time</label>
-          <input type="text" class="step-time" placeholder="e.g., 10 min">
-        `;
-
-        container.appendChild(step);
-      }
-    });
-
-    // Save to Firestore
     document.getElementById("saveIdeaBtn").addEventListener("click", async () => {
       const title = document.getElementById("ideaTitle").value;
       const type = Array.from(document.querySelectorAll(".type-check:checked"))
                   .map(cb => cb.value);
       const materials = document.getElementById("ideaMaterials").value;
       const difficulty = document.getElementById("ideaDifficulty").value;
-      const priority = document.getElementById("ideaPriority").value;
 
-      const steps = [];
-      const blocks = document.querySelectorAll(".step-block");
+      // ⭐ PHOTO UPLOADS MUST BE INSIDE THE CLICK HANDLER
+      const storage = getStorage(app);
+      const photoFiles = document.getElementById("ideaPhotos").files;
 
-      blocks.forEach(block => {
-        steps.push({
-          title: block.querySelector(".step-title").value,
-          materials: block.querySelector(".step-materials").value,
-          difficulty: block.querySelector(".step-difficulty").value,
-          time: block.querySelector(".step-time").value
-        });
-      });
+      const photoURLs = [];
 
+      for (let file of photoFiles) {
+        const storageRef = ref(storage, `ideaPhotos/${Date.now()}_${file.name}`);
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        photoURLs.push(url);
+      }
+
+      // ⭐ NOW SAVE EVERYTHING TO FIRESTORE
       await addDoc(collection(db, "ideas"), {
         title,
         type,
         materials,
         difficulty,
-        priority,
-        steps,
+        photos: photoURLs,
         createdAt: new Date()
       });
 
