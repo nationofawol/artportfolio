@@ -95,58 +95,62 @@
       const list = document.getElementById("ideaList");
       list.innerHTML = "<p>Loading ideas...</p>";
 
-      const querySnapshot = await getDocs(collection(db, "ideas"));
+      // ⭐ Load ALL ideas
+      const snapshot = await getDocs(collection(db, "ideas"));
 
       list.innerHTML = ""; // clear loading text
 
-      querySnapshot.forEach(doc => {
+      snapshot.forEach(doc => {
         const data = doc.data();
-        const item = document.createElement("div");
-        item.className = "idea-item";
 
+        // ⭐ Only show NOT finished
+        if (data.status !== "Finished") {
+          const item = document.createElement("div");
+          item.className = "idea-item";
 
-        const titlediv = document.createElement("div");
+          // Clickable title → opens wipproject.html?id=DOC_ID
+          const title = document.createElement("a");
+          title.textContent = data.title;
+          title.href = `wipproject.html?id=${doc.id}`;
+          title.style.fontWeight = "600";
+          title.style.textDecoration = "none";
+          title.style.color = "inherit";
 
-        // Clickable title → opens idea.html?id=DOC_ID
-        const title = document.createElement("a");
-        title.textContent = data.title;
-        title.href = `wipproject.html?id=${doc.id}`;
-        title.style.fontWeight = "600";
-        title.style.textDecoration = "none";
-        title.style.color = "inherit";
+          // Hover details
+          const details = document.createElement("div");
+          details.className = "idea-details";
+          details.innerHTML = [
+            data.type ? `<li>Type: ${data.type.join(", ")}</li>` : null,
+            data.materials ? `<li>Materials: ${data.materials}</li>` : null,
+            data.difficulty ? `<li>Difficulty: ${data.difficulty}</li>` : null,
+            data.priority ? `<li>Priority: ${data.priority}</li>` : null
+          ].filter(Boolean).join(" ") || "<p>(no details yet)</p>";
 
-       // Hover details
-        const details = document.createElement("div");
-        details.className = "idea-details";
-        details.innerHTML = [
-        data.type ? `<li> Type: ${data.type.join(", ")}</li>` : null,
-        data.materials ? `<li> Materials: ${data.materials}</li>` : null,
-        data.difficulty ? `<li> Difficulty: ${data.difficulty}</li>` : null,
-        data.priority ? `<li> Priority: ${data.priority}</li>` : null
-        ].filter(Boolean).join(" ") || "<p>(no details yet)</p>";
+          item.appendChild(title);
+          item.appendChild(details);
+          list.appendChild(item);
 
-        item.appendChild(title);
-        item.appendChild(details);
-        list.appendChild(item);
+          // Hover behavior
+          item.addEventListener("mouseenter", () => {
+            item.classList.add("expanded");
+            details.classList.add("expanded");
+          });
 
-        item.addEventListener("mouseenter", () => {
-          item.classList.add("expanded");
-          details.classList.add("expanded");
-        });
-
-        item.addEventListener("mouseleave", () => {
-          item.classList.remove("expanded");
-          details.classList.remove("expanded");
-        });
+          item.addEventListener("mouseleave", () => {
+            item.classList.remove("expanded");
+            details.classList.remove("expanded");
+          });
+        }
       });
-    
-      if (list.innerHTML.trim() === "") {
-      list.innerHTML = "<p>No ideas yet.</p>";
-      }
-    }
 
-    loadIdeas();
-  </script>
+      if (list.innerHTML.trim() === "") {
+        list.innerHTML = "<p>No in-progress ideas.</p>";
+    }
+  }
+
+  loadIdeas();
+</script>
+
 
 </body>
 </html>
