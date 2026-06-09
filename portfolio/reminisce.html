@@ -94,61 +94,59 @@
 
   <div id="galleryGrid"></div>
 
-  <!-- FIREBASE -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, getDocs }
-      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, query, where }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCLfSyJTrfKJ11y0-OD-tqce51hAhB9ubk",
-      authDomain: "artportfolio-7fb57.firebaseapp.com",
-      projectId: "artportfolio-7fb57",
-      storageBucket: "artportfolio-7fb57.firebasestorage.app",
-      messagingSenderId: "221364362709",
-      appId: "1:221364362709:web:4ad550bd8970302ef0715c"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyCLfSyJTrfKJ11y0-OD-tqce51hAhB9ubk",
+    authDomain: "artportfolio-7fb57.firebaseapp.com",
+    projectId: "artportfolio-7fb57",
+    storageBucket: "artportfolio-7fb57.firebasestorage.app",
+    messagingSenderId: "221364362709",
+    appId: "1:221364362709:web:4ad550bd8970302ef0715c"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-    async function loadGallery() {
-      const gallery = document.getElementById("galleryGrid");
-        import { query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  async function loadGallery() {
+    const gallery = document.getElementById("galleryGrid");
 
-            const q = query(
-            collection(db, "ideas"),
-            where("status", "==", "Finished")
-            );
+    // ⭐ Only load finished projects
+    const q = query(
+      collection(db, "ideas"),
+      where("status", "==", "Finished")
+    );
 
-        const snapshot = await getDocs(q);
+    const snapshot = await getDocs(q);
 
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const thumb = data.photos?.[0] || "https://via.placeholder.com/300x200?text=No+Image";
 
-        snapshot.forEach(doc => {
-        const data = doc.data();
+      const card = document.createElement("div");
+      card.className = "project-card";
 
-        const thumb = data.photos?.[0] || "https://via.placeholder.com/300x200?text=No+Image";
+      card.innerHTML = `
+        <img class="project-thumb" src="${thumb}">
+        <div class="project-info">${data.title}</div>
 
-        const card = document.createElement("div");
-        card.className = "project-card";
+        <div class="project-hover">
+          <div><strong>Type:</strong> ${data.type?.join(", ") || "N/A"}</div>
+          <div><strong>Materials:</strong> ${data.materials || "N/A"}</div>
+          <div><strong>Difficulty:</strong> ${data.difficulty || "N/A"}</div>
+        </div>
+      `;
 
-        card.innerHTML = `
-          <img class="project-thumb" src="${thumb}">
-          <div class="project-info">${data.title}</div>
+      gallery.appendChild(card);
+    });
+  }
 
-          <div class="project-hover">
-            <div><strong>Type:</strong> ${data.type?.join(", ") || "N/A"}</div>
-            <div><strong>Materials:</strong> ${data.materials || "N/A"}</div>
-            <div><strong>Difficulty:</strong> ${data.difficulty || "N/A"}</div>
-          </div>
-        `;
+  loadGallery();
+</script>
 
-        gallery.appendChild(card);
-      });
-    }
-
-    loadGallery();
-  </script>
 
 </body>
 </html>
