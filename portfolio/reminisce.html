@@ -114,9 +114,17 @@
 
     async function loadGallery() {
       const gallery = document.getElementById("galleryGrid");
-      const snapshot = await getDocs(collection(db, "ideas"));
+        import { query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-      snapshot.forEach(doc => {
+            const q = query(
+            collection(db, "ideas"),
+            where("status", "==", "Finished")
+            );
+
+        const snapshot = await getDocs(q);
+
+
+        snapshot.forEach(doc => {
         const data = doc.data();
 
         const thumb = data.photos?.[0] || "https://via.placeholder.com/300x200?text=No+Image";
