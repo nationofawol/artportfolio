@@ -62,6 +62,25 @@
       max-height: 500px; /* or bigger if needed */
     }
 
+      #filters {
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+    background: #fe8e3d;
+    color: white;
+    border-radius: 10px;
+    margin: 20px auto;
+    width: fit-content;
+  }
+
+  #filters select {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ffffff;
+    font-size: 16px;
+  }
+
+
 
   </style>
 </head>
@@ -69,6 +88,39 @@
 <body>
 
   <h1>Your Ideas</h1>
+
+  <div id="filters">
+    <select id="filterDifficulty">
+      <option value="Easy">Easy</option>
+      <option value="Medium">Medium</option>
+      <option value="Hard">Hard</option>
+    </select>
+
+    <select id="filterType">
+      <option value="Acrylic Painting">Acrylic Painting</option>
+      <option value="Beading">Beading</option>
+      <option value="Candle Making">Candle Making</option>
+      <option value="Clay">Clay</option>
+      <option value="Crocheting">Crocheting</option>
+      <option value="Digital Art">Digital Art</option>
+      <option value="Embroidering">Embroidering</option>
+      <option value="Oil Painting">Oil Painting</option>
+      <option value="Resin">Resin</option>
+      <option value="Sewing">Sewing</option>
+      <option value="Watercolor">Watercolor</option>
+      <option value="Website Building">Website Building</option>
+      <option value="Woodworking">Woodworking</option>
+      <option value="Other">Other</option>
+      <!-- Add your actual types here -->
+    </select>
+
+    <select id="filterPriority">
+      <option value="Low">Low</option>
+      <option value="Medium">Medium</option>
+      <option value="High">High</option>
+    </select>
+  </div>
+
 
   <div class="idea-list" id="ideaList">
     <p>Loading ideas...</p>
@@ -91,40 +143,60 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    async function loadIdeas() {
+        async function loadIdeas() {
       const list = document.getElementById("ideaList");
       list.innerHTML = "<p>Loading ideas...</p>";
 
-      // ⭐ Load ALL ideas
+      // Load ALL ideas
       const snapshot = await getDocs(collection(db, "ideas"));
-
-      list.innerHTML = ""; // clear loading text
+      const allIdeas = [];
 
       snapshot.forEach(doc => {
         const data = doc.data();
+        allIdeas.push({ id: doc.id, ...data });
+      });
 
-        // ⭐ Only show NOT finished
-        if (data.status !== "Finished") {
+      list.innerHTML = ""; // clear loading text
+
+      function renderFiltered() {
+        list.innerHTML = "";
+
+        const diffFilter = document.getElementById("filterDifficulty").value;
+        const typeFilter = document.getElementById("filterType").value;
+        const priorityFilter = document.getElementById("filterPriority").value;
+
+        const filtered = allIdeas.filter(idea => {
+          if (idea.status === "Finished") return false;
+          if (diffFilter && idea.difficulty !== diffFilter) return false;
+          if (typeFilter && (!idea.type || !idea.type.includes(typeFilter))) return false;
+          if (priorityFilter && idea.priority !== priorityFilter) return false;
+          return true;
+        });
+
+        if (filtered.length === 0) {
+          list.innerHTML = "<p>No in-progress ideas.</p>";
+          return;
+        }
+
+        filtered.forEach(idea => {
           const item = document.createElement("div");
           item.className = "idea-item";
 
-          // Clickable title → opens wipproject.html?id=DOC_ID
           const title = document.createElement("a");
-          title.textContent = data.title;
-          title.href = `wipproject.html?id=${doc.id}`;
+          title.textContent = idea.title;
+          title.href = `wipproject.html?id=${idea.id}`;
           title.style.fontWeight = "600";
           title.style.textDecoration = "none";
           title.style.color = "inherit";
 
-          // Hover details
           const details = document.createElement("div");
           details.className = "idea-details";
           details.innerHTML = [
-            data.type ? `<li>Type: ${data.type.join(", ")}</li>` : null,
-            data.materials ? `<li>Materials: ${data.materials}</li>` : null,
-            data.difficulty ? `<li>Difficulty: ${data.difficulty}</li>` : null,
-            data.priority ? `<li>Priority: ${data.priority}</li>` : null
-          ].filter(Boolean).join(" ") || "<p>(no details yet)</p>";
+            idea.type ? `<li>Type: ${idea.type.join(", ")}</li>` : null,
+            idea.materials ? `<li>Materials: ${idea.materials}</li>` : null,
+            idea.difficulty ? `<li>Difficulty: ${idea.difficulty}</li>` : null,
+            idea.priority ? `<li>Priority: ${idea.priority}</li>` : null
+          ].filter(Boolean).join(" ");
 
           item.appendChild(title);
           item.appendChild(details);
@@ -140,15 +212,21 @@
             item.classList.remove("expanded");
             details.classList.remove("expanded");
           });
-        }
-      });
+        });
+      }
 
-      if (list.innerHTML.trim() === "") {
-        list.innerHTML = "<p>No in-progress ideas.</p>";
+      // Re-render when filters change
+      document.getElementById("filterDifficulty").addEventListener("change", renderFiltered);
+      document.getElementById("filterType").addEventListener("change", renderFiltered);
+      document.getElementById("filterPriority").addEventListener("change", renderFiltered);
+
+      // Initial render
+      renderFiltered();
     }
-  }
 
-  loadIdeas();
+    // Call the function
+    loadIdeas();
+
 </script>
 
 
