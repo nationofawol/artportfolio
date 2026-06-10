@@ -218,11 +218,16 @@
       return true;
     });
 
-    filtered.forEach(data => {
+        filtered.forEach(data => {
       const thumb = data.photos?.[0] || "https://via.placeholder.com/300x200?text=No+Image";
 
       const card = document.createElement("div");
       card.className = "project-card";
+
+      // Make the entire card clickable
+      card.addEventListener("click", () => {
+        window.location.href = `../archived.html?id=${data.id}`;
+      });
 
       card.innerHTML = `
         <img class="project-thumb" src="${thumb}">

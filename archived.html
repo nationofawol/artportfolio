@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <a href="index.html" class="nav-btn">Home!</a>
+  <title>Idea Details</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Josefin Sans', sans-serif;
+      background: #b7008c;
+      padding: 30px;
+      margin: 0;
+      color: white;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      background: white;
+      color: #b7008c;
+      padding: 25px;
+      border-radius: 12px;
+    }
+
+    a {
+      color: #b7008c;
+      font-weight: 600;
+    }
+
+    ul {
+      margin-top: 5px;
+      margin-bottom: 15px;
+      padding-left: 20px;
+      color: #444;
+    }
+
+    ul li {
+      margin-bottom: 6px;
+    }
+
+     .nav-btn {
+      background: #fe8e3d;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      }
+
+    .nav-btn:hover {
+      background: #e6762d;
+    }
+
+    .step-card {
+      background: #f7f7f7;
+      border-left: 6px solid #fe8e3d;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      color: #444;
+    }
+
+    .step-card h3 {
+      margin: 0 0 8px 0;
+      color: #b7008c;
+    }
+
+    .step-meta {
+      font-size: 14px;
+      margin-top: 6px;
+      color: #666;
+    }
+
+    .total-time-badge {
+      display: inline-block;
+      background: #fe8e3d;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .action-btn {
+      background: #b7008c;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-right: 10px;
+      font-size: 15px;
+    }
+
+    .action-btn:hover {
+      background: #9a0075;
+    }
+
+    .action-btn.delete {
+      background: #ff0015;
+    }
+
+    .action-btn.delete:hover {
+      background: #cc0011;
+    }
+
+    .carousel {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.carousel img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  transition: opacity 0.4s ease;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.4);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.carousel-btn.prev { left: 10px; }
+.carousel-btn.next { right: 10px; }
+
+.carousel-btn:hover {
+  background: rgba(0,0,0,0.7);
+}
+
+
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <a href="reminisce.html">← Back to archived projects</a>
+    <h1 id="title">Loading...</h1>
+    <div id="photoCarousel" class="carousel"></div>
+
+    <p><strong>Type:</strong></p>
+    <ul id="type"></ul>
+
+    <p><strong>Materials:</strong></p>
+    <p id="materials"></p>
+
+    <p><strong>Difficulty:</strong> <span id="difficulty"></span></p>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, deleteDoc }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCLfSyJTrfKJ11y0-OD-tqce51hAhB9ubk",
+      authDomain: "artportfolio-7fb57.firebaseapp.com",
+      projectId: "artportfolio-7fb57",
+      storageBucket: "artportfolio-7fb57.firebasestorage.app",
+      messagingSenderId: "221364362709",
+      appId: "1:221364362709:web:4ad550bd8970302ef0715c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function loadIdea() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get("id");
+
+      const docRef = doc(db, "ideas", id);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        document.getElementById("title").textContent = "Idea not found";
+        return;
+      }
+
+      const data = docSnap.data();
+
+      document.getElementById("title").textContent = data.title;
+
+
+
+      // --- PHOTO CAROUSEL ---
+const carousel = document.getElementById("photoCarousel");
+carousel.innerHTML = "";
+
+if (data.photos && data.photos.length > 0) {
+  // Add images
+  data.photos.forEach((url, i) => {
+    const img = document.createElement("img");
+    img.src = url;
+    img.style.display = i === 0 ? "block" : "none";
+    carousel.appendChild(img);
+  });
+
+  // Add buttons
+  const prev = document.createElement("button");
+  prev.textContent = "❮";
+  prev.className = "carousel-btn prev";
+
+  const next = document.createElement("button");
+  next.textContent = "❯";
+  next.className = "carousel-btn next";
+
+  carousel.appendChild(prev);
+  carousel.appendChild(next);
+
+  let index = 0;
+  const imgs = carousel.querySelectorAll("img");
+
+  function showImage(i) {
+    imgs.forEach((img, idx) => {
+      img.style.display = idx === i ? "block" : "none";
+    });
+  }
+
+  prev.addEventListener("click", () => {
+    index = (index - 1 + imgs.length) % imgs.length;
+    showImage(index);
+  });
+
+  next.addEventListener("click", () => {
+    index = (index + 1) % imgs.length;
+    showImage(index);
+  });
+}
+
+
+      // --- TYPE ---
+      const typeList = document.getElementById("type");
+      typeList.innerHTML = "";
+      data.type?.forEach(t => {
+        const li = document.createElement("li");
+        li.textContent = t;
+        typeList.appendChild(li);
+      });
+
+      // --- MATERIALS ---
+      document.getElementById("materials").textContent = data.materials;
+
+      // --- DIFFICULTY + PRIORITY ---
+      document.getElementById("difficulty").textContent = data.difficulty;
+      
+    }
+
+    loadIdea();
+  </script>
+
+</body>
+</html>
