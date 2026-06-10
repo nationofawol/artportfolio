@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <a href="index.html" class="nav-btn">Home!</a>
   <title>Reminisce</title>
   <!-- version 1 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -89,12 +90,81 @@
     .project-card:hover .project-hover {
       opacity: 1;
     }
+
+
+      #filters {
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+    background: #fe8e3d;
+    border-radius: 10px;
+    margin: 20px auto;
+    width: fit-content;
+    }
+
+    #filters select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #fe8e3d;
+    color: white;
+    border: 2px solid white;
+    font-size: 16px;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    }
+
+
+     .nav-btn {
+      background: #fe8e3d;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      }
+
+    .nav-btn:hover {
+      background: #e6762d;
+    }
+
+    
   </style>
 </head>
 
 <body>
 
   <h1>Reminisce</h1>
+
+  <div id="filters">
+  <select id="filterDifficulty">
+    <option value="">All Difficulties</option>
+    <option value="Easy">Easy</option>
+    <option value="Medium">Medium</option>
+    <option value="Hard">Hard</option>
+  </select>
+
+  <select id="filterType">
+    <option value="">All Types</option>
+    <option value="Acrylic Painting">Acrylic Painting</option>
+    <option value="Beading">Beading</option>
+    <option value="Candle Making">Candle Making</option>
+    <option value="Clay">Clay</option>
+    <option value="Crocheting">Crocheting</option>
+    <option value="Digital Art">Digital Art</option>
+    <option value="Embroidering">Embroidering</option>
+    <option value="Oil Painting">Oil Painting</option>
+    <option value="Resin">Resin</option>
+    <option value="Sewing">Sewing</option>
+    <option value="Watercolor">Watercolor</option>
+    <option value="Website Building">Website Building</option>
+    <option value="Woodworking">Woodworking</option>
+    <option value="Other">Other</option>
+  </select>
+
+</div>
+
 
   <div id="galleryGrid"></div>
 
@@ -116,18 +186,34 @@
   const db = getFirestore(app);
 
   async function loadGallery() {
-    const gallery = document.getElementById("galleryGrid");
+  const gallery = document.getElementById("galleryGrid");
 
-    // ⭐ Only load finished projects
-    const q = query(
-      collection(db, "ideas"),
-      where("status", "==", "Finished")
-    );
+  // Load only finished projects
+  const q = query(
+    collection(db, "ideas"),
+    where("status", "==", "Finished")
+  );
 
-    const snapshot = await getDocs(q);
+  const snapshot = await getDocs(q);
+  const allProjects = [];
 
-    snapshot.forEach(doc => {
-      const data = doc.data();
+  snapshot.forEach(doc => {
+    allProjects.push({ id: doc.id, ...doc.data() });
+  });
+
+  function renderFiltered() {
+    gallery.innerHTML = "";
+
+    const diffFilter = document.getElementById("filterDifficulty").value;
+    const typeFilter = document.getElementById("filterType").value;
+
+    const filtered = allProjects.filter(p => {
+      if (diffFilter && p.difficulty !== diffFilter) return false;
+      if (typeFilter && (!p.type || !p.type.includes(typeFilter))) return false;
+      return true;
+    });
+
+    filtered.forEach(data => {
       const thumb = data.photos?.[0] || "https://via.placeholder.com/300x200?text=No+Image";
 
       const card = document.createElement("div");
@@ -146,9 +232,22 @@
 
       gallery.appendChild(card);
     });
+
+    if (filtered.length === 0) {
+      gallery.innerHTML = `<p style="text-align:center;">No finished projects match your filters.</p>`;
+    }
   }
 
-  loadGallery();
+  // Filter listeners
+  document.getElementById("filterDifficulty").addEventListener("change", renderFiltered);
+  document.getElementById("filterType").addEventListener("change", renderFiltered);
+
+  // Initial render
+  renderFiltered();
+}
+
+loadGallery();
+
 </script>
 
 
