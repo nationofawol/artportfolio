@@ -291,6 +291,7 @@ async function loadExistingIdea(id) {
       blocks[i].querySelector(".step-title").value = step.title;
       blocks[i].querySelector(".step-materials").value = step.materials;
       blocks[i].querySelector(".step-difficulty").value = step.difficulty;
+      blocks[i].querySelector(".step-status").value = step.status;
       blocks[i].querySelector(".step-time").value = step.time;
     });
   }
@@ -324,6 +325,12 @@ function generateStepBlocks(count) {
         <option>Hard</option>
       </select>
 
+      <label>Status</label>
+      <select class="step-status">
+        <option>Not Started</option>
+        <option>Finished</option>
+      </select>
+
       <label>Approx. Time</label>
       <input type="text" class="step-time" placeholder="e.g., 10 min">
     `;
@@ -352,6 +359,7 @@ document.getElementById("saveIdeaBtn").addEventListener("click", async () => {
       title: block.querySelector(".step-title").value,
       materials: block.querySelector(".step-materials").value,
       difficulty: block.querySelector(".step-difficulty").value,
+      status: block.querySelector(".step-status").value,
       time: block.querySelector(".step-time").value
     });
   });
