@@ -207,6 +207,13 @@
       <option>High</option>
     </select>
 
+    <label>Status</label>
+    <select id="ideaStatus">
+      <option>Not Started</option>
+      <option>In Progress</option>
+      <option>Completed</option>
+    </select>
+
     <label>Number of Steps</label>
     <input type="number" id="stepCount" min="1" max="20" placeholder="Enter number of steps">
 
@@ -223,11 +230,12 @@
 
   <!-- FIREBASE + SAVE LOGIC -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, addDoc }
-      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { 
+  getFirestore, collection, addDoc, doc, getDoc, updateDoc 
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    const firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyCLfSyJTrfKJ11y0-OD-tqce51hAhB9ubk",
   authDomain: "artportfolio-7fb57.firebaseapp.com",
   projectId: "artportfolio-7fb57",
@@ -236,85 +244,139 @@
   appId: "1:221364362709:web:4ad550bd8970302ef0715c"
 };
 
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+// Detect edit mode
+const params = new URLSearchParams(window.location.search);
+const editId = params.get("id");
 
-    // Dynamic Step Generator
-    document.getElementById("stepCount").addEventListener("input", function () {
-      const count = parseInt(this.value);
-      const container = document.getElementById("stepsContainer");
-      container.innerHTML = "";
+// Load existing idea if editing
+if (editId) loadExistingIdea(editId);
 
-      if (!count || count < 1) return;
+async function loadExistingIdea(id) {
+  const docRef = doc(db, "ideas", id);
+  const snap = await getDoc(docRef);
 
-      for (let i = 1; i <= count; i++) {
-        const step = document.createElement("div");
-        step.className = "step-block";
+  if (!snap.exists()) {
+    alert("Idea not found.");
+    return;
+  }
 
-        step.innerHTML = `
-          <h3>Step ${i}</h3>
+  const data = snap.data();
 
-          <label>Step Title</label>
-          <input type="text" class="step-title">
+  // PREFILL FIELDS
+  document.getElementById("ideaTitle").value = data.title || "";
+  document.getElementById("ideaMaterials").value = data.materials || "";
+  document.getElementById("ideaDifficulty").value = data.difficulty || "";
+  document.getElementById("ideaPriority").value = data.priority || "";
+  document.getElementById("ideaStatus").value = data.status || "";
 
-          <label>Materials Needed</label>
-          <textarea class="step-materials"></textarea>
-
-          <label>Difficulty</label>
-          <select class="step-difficulty">
-            <option>Easy</option>
-            <option>Medium</option>
-            <option>Hard</option>
-          </select>
-
-          <label>Approx. Time</label>
-          <input type="text" class="step-time" placeholder="e.g., 10 min">
-        `;
-
-        container.appendChild(step);
-      }
+  // PREFILL TYPE CHECKBOXES
+  if (Array.isArray(data.type)) {
+    data.type.forEach(t => {
+      const checkbox = document.querySelector(`.type-check[value="${t}"]`);
+      if (checkbox) checkbox.checked = true;
     });
+  }
 
-    // Save to Firestore
-    document.getElementById("saveIdeaBtn").addEventListener("click", async () => {
-      const title = document.getElementById("ideaTitle").value;
-      const type = Array.from(document.querySelectorAll(".type-check:checked"))
-                  .map(cb => cb.value);
-      const materials = document.getElementById("ideaMaterials").value;
-      const difficulty = document.getElementById("ideaDifficulty").value;
-      const priority = document.getElementById("ideaPriority").value;
+  // PREFILL STEPS
+  if (data.steps) {
+    document.getElementById("stepCount").value = data.steps.length;
+    generateStepBlocks(data.steps.length);
 
-      const steps = [];
-      const blocks = document.querySelectorAll(".step-block");
-
-      blocks.forEach(block => {
-        steps.push({
-          title: block.querySelector(".step-title").value,
-          materials: block.querySelector(".step-materials").value,
-          difficulty: block.querySelector(".step-difficulty").value,
-          time: block.querySelector(".step-time").value
-        });
-      });
-
-      await addDoc(collection(db, "ideas"), {
-        title,
-        type,
-        materials,
-        difficulty,
-        priority,
-        steps,
-        createdAt: new Date()
-      });
-
-      alert("Idea saved!");
+    const blocks = document.querySelectorAll(".step-block");
+    data.steps.forEach((step, i) => {
+      blocks[i].querySelector(".step-title").value = step.title;
+      blocks[i].querySelector(".step-materials").value = step.materials;
+      blocks[i].querySelector(".step-difficulty").value = step.difficulty;
+      blocks[i].querySelector(".step-time").value = step.time;
     });
+  }
 
+  // Change button text
+  document.getElementById("saveIdeaBtn").textContent = "Update Idea";
+}
 
-    
+// STEP GENERATOR
+function generateStepBlocks(count) {
+  const container = document.getElementById("stepsContainer");
+  container.innerHTML = "";
 
+  for (let i = 1; i <= count; i++) {
+    const step = document.createElement("div");
+    step.className = "step-block";
 
-  </script>
+    step.innerHTML = `
+      <h3>Step ${i}</h3>
+
+      <label>Step Title</label>
+      <input type="text" class="step-title">
+
+      <label>Materials Needed</label>
+      <textarea class="step-materials"></textarea>
+
+      <label>Difficulty</label>
+      <select class="step-difficulty">
+        <option>Easy</option>
+        <option>Medium</option>
+        <option>Hard</option>
+      </select>
+
+      <label>Approx. Time</label>
+      <input type="text" class="step-time" placeholder="e.g., 10 min">
+    `;
+
+    container.appendChild(step);
+  }
+}
+
+document.getElementById("stepCount").addEventListener("input", function () {
+  const count = parseInt(this.value);
+  if (count > 0) generateStepBlocks(count);
+});
+
+// SAVE BUTTON
+document.getElementById("saveIdeaBtn").addEventListener("click", async () => {
+  const title = document.getElementById("ideaTitle").value;
+  const type = Array.from(document.querySelectorAll(".type-check:checked"))
+              .map(cb => cb.value);
+  const materials = document.getElementById("ideaMaterials").value;
+  const difficulty = document.getElementById("ideaDifficulty").value;
+  const priority = document.getElementById("ideaPriority").value;
+
+  const steps = [];
+  document.querySelectorAll(".step-block").forEach(block => {
+    steps.push({
+      title: block.querySelector(".step-title").value,
+      materials: block.querySelector(".step-materials").value,
+      difficulty: block.querySelector(".step-difficulty").value,
+      time: block.querySelector(".step-time").value
+    });
+  });
+
+  const ideaData = {
+    title,
+    type,
+    materials,
+    difficulty,
+    priority,
+    status,
+    steps,
+    createdAt: new Date()
+  };
+
+  if (editId) {
+    await updateDoc(doc(db, "ideas", editId), ideaData);
+  } else {
+    await addDoc(collection(db, "ideas"), ideaData);
+  }
+
+  alert("Idea saved!");
+  window.location.href = "list.html";
+});
+</script>
+
 
 </body>
 </html>
