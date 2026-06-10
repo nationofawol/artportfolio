@@ -72,13 +72,24 @@
     margin: 20px auto;
     width: fit-content;
   }
+#filters select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #fe8e3d;   /* orange background */
+  color: white;           /* white text */
+  border: 2px solid white;
+  font-size: 16px;
+  cursor: pointer;
+}
 
-  #filters select {
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: 1px solid #ffffff;
-    font-size: 16px;
-  }
+#filters select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: #fe8e3d url("data:image/svg+xml;utf8,<svg fill='white' height='20' width='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'><polygon points='0,0 20,0 10,10'/></svg>") no-repeat right 10px center;
+  background-size: 12px;
+}
+
 
 
 
