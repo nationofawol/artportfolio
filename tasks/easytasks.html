@@ -260,10 +260,14 @@
             details.classList.remove("expanded");
             });
 
-            // Click to open project
-            item.addEventListener("click", () => {
-            window.location.href = `wipproject.html?id=${step.projectId}`;
+            item.style.cursor = "pointer";
+
+            item.addEventListener("click", (e) => {
+            // Prevent hover expansion from blocking the click
+            e.stopPropagation();
+            window.location.href = `../wipproject.html?id=${step.projectId}`;
             });
+
         });
         }
 
