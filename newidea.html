@@ -105,6 +105,56 @@
       background: #ff7a1a;
     }
 
+
+    /* Upload section container */
+#uploadSection {
+  margin-top: 20px;
+  padding: 15px;
+  background: #ffffff;
+  border-radius: 10px;
+  color: #b7008c;
+  display: none; /* stays hidden until Finished is selected */
+}
+
+/* Upload label */
+#uploadSection label {
+  font-weight: 600;
+  color: #b7008c;
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* File input styling */
+#ideaPhotos {
+  background: #fff;
+  border: 2px solid #b7008c;
+  padding: 10px;
+  border-radius: 8px;
+  width: 100%;
+  cursor: pointer;
+  color: #b7008c;
+  font-weight: 500;
+}
+
+/* Photo preview grid */
+.photo-preview {
+  margin-top: 15px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+/* Individual preview images */
+.photo-preview img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #b7008c;
+}
+
+
+
     .step-block {
       background: #f7f7f7;
       padding: 15px;
@@ -228,6 +278,13 @@
       <option>Finished</option>
     </select>
 
+    <div id="uploadSection" style="display:none;">
+    <label>Upload Photos</label>
+    <input type="file" id="ideaPhotos" accept="image/*" multiple>
+    <div id="photoPreview" class="photo-preview"></div>
+    </div>
+
+
     <label>Number of Steps</label>
     <input type="number" id="stepCount" min="1" max="20" placeholder="Enter number of steps">
 
@@ -244,19 +301,28 @@
 
   <!-- FIREBASE + SAVE LOGIC -->
   <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { 
-  getFirestore, collection, addDoc, doc, getDoc, updateDoc 
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+          const statusSelect = document.getElementById("ideaStatus");
+      const uploadSection = document.getElementById("uploadSection");
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCLfSyJTrfKJ11y0-OD-tqce51hAhB9ubk",
-  authDomain: "artportfolio-7fb57.firebaseapp.com",
-  projectId: "artportfolio-7fb57",
-  storageBucket: "artportfolio-7fb57.firebasestorage.app",
-  messagingSenderId: "221364362709",
-  appId: "1:221364362709:web:4ad550bd8970302ef0715c"
-};
+      statusSelect.addEventListener("change", () => {
+        uploadSection.style.display =
+          statusSelect.value === "Finished" ? "block" : "none";
+      });
+
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { 
+      getFirestore, collection, addDoc, doc, getDoc, updateDoc 
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCLfSyJTrfKJ11y0-OD-tqce51hAhB9ubk",
+      authDomain: "artportfolio-7fb57.firebaseapp.com",
+      projectId: "artportfolio-7fb57",
+      storageBucket: "artportfolio-7fb57.firebasestorage.app",
+      messagingSenderId: "221364362709",
+      appId: "1:221364362709:web:4ad550bd8970302ef0715c"
+    };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -357,15 +423,16 @@ document.getElementById("stepCount").addEventListener("input", function () {
   if (count > 0) generateStepBlocks(count);
 });
 
-// SAVE BUTTON
 document.getElementById("saveIdeaBtn").addEventListener("click", async () => {
   const title = document.getElementById("ideaTitle").value;
   const type = Array.from(document.querySelectorAll(".type-check:checked"))
-              .map(cb => cb.value);
+                .map(cb => cb.value);
   const materials = document.getElementById("ideaMaterials").value;
   const difficulty = document.getElementById("ideaDifficulty").value;
   const priority = document.getElementById("ideaPriority").value;
+  const status = document.getElementById("ideaStatus").value;
 
+  // Build steps array
   const steps = [];
   document.querySelectorAll(".step-block").forEach(block => {
     steps.push({
@@ -377,6 +444,22 @@ document.getElementById("saveIdeaBtn").addEventListener("click", async () => {
     });
   });
 
+  // Upload photos only if Finished
+  let photoURLs = [];
+  const photoFiles = document.getElementById("ideaPhotos").files;
+
+  if (status === "Finished" && photoFiles.length > 0) {
+    const storage = getStorage(app);
+
+    for (let file of photoFiles) {
+      const storageRef = ref(storage, `ideaPhotos/${Date.now()}_${file.name}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      photoURLs.push(url);
+    }
+  }
+
+  // Build Firestore object
   const ideaData = {
     title,
     type,
@@ -385,9 +468,11 @@ document.getElementById("saveIdeaBtn").addEventListener("click", async () => {
     priority,
     status,
     steps,
+    photos: photoURLs,
     createdAt: new Date()
   };
 
+  // Save or update
   if (editId) {
     await updateDoc(doc(db, "ideas", editId), ideaData);
   } else {
@@ -397,6 +482,7 @@ document.getElementById("saveIdeaBtn").addEventListener("click", async () => {
   alert("Idea saved!");
   window.location.href = "list.html";
 });
+
 </script>
 
 
